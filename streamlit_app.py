@@ -102,7 +102,7 @@ st.session_state.messages.append({"role": "user", "content": prompt})
 st.session_state.selected_model = None
 
 
-if prompt := st.chat_input("Hi, I'm James. how may I help you?", key="user_input"):
+if prompt := st.chat_input("Hi, I'm James! how may I help you?", key="user_input"):
     st.session_state.messages.append({"role": "user", "content": prompt})
    
     # Process the user's input and respond accordingly
