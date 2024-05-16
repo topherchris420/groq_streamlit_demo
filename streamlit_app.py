@@ -1,7 +1,6 @@
 import streamlit as st
 from typing import Generator
 from groq import Groq
-import base64
 import os
 from typing import Optional, Dict, Union
 
