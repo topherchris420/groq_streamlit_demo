@@ -31,10 +31,10 @@ def icon(emoji: str):
 
 icon("🐶")
 st.markdown(f'<a href="https://christopher.streamlit.app/" style="text-decoration:none; color: #0e76a8;"><h2>Vers3Dynamics</h2></a>', unsafe_allow_html=True)
-st.subheader("Meet Your Virtual Assistants, Powered by Groq 🚀", divider="rainbow", anchor=False)
+st.subheader("Meet Your FurBuddy, Powered by Groq 🚀", divider="rainbow", anchor=False)
 
 # Add a picture with a caption
-st.image("images/WelcomeHometitle.png", caption="What can I help you with?", width=200)
+st.image("images/WelcomeHometitle.png", caption="Woof woof!", width=200)
 
 client = Groq(
     api_key=st.secrets["GROQ_API_KEY"],
@@ -103,7 +103,7 @@ st.session_state.messages.append({"role": "user", "content": prompt})
 st.session_state.selected_model = None
 
 
-if prompt := st.chat_input("Hi! I'm James, your FurBuddy. How may I help you?", key="user_input"):
+if prompt := st.chat_input("Hi, I'm James. how may I help you?", key="user_input"):
     st.session_state.messages.append({"role": "user", "content": prompt})
    
     # Process the user's input and respond accordingly
