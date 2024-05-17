@@ -5,6 +5,13 @@ import os
 from typing import Optional, Dict, Union
 
 
+# Create a new `st.session_state` object with a maximum length of 100
+st.session_state = st.session_state(max_length=100)
+
+
+
+
+
 def _get_system_prompt():
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "system_prompt.txt")
