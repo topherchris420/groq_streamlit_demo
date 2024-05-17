@@ -63,7 +63,7 @@ with col1:
         "Connect with the perfect AI:",
         options=list(models.keys()),
         format_func=lambda x: models[x]["name"],
-        index=2  # Default to LLaMA
+        index=3  # Default to LLaMA
     )
 
 # Detect model change and clear chat history if model has changed
@@ -131,7 +131,7 @@ if prompt := st.chat_input("Hi, I'm James! how may I help you?", key="user_input
             chat_responses_generator = generate_chat_responses(chat_completion)
             full_response = st.write_stream(chat_responses_generator)
     except Exception as e:
-        st.error(f"Oops! Something went wrong: {e}", icon="🐢🚨")
+        st.error(f"Oops! I farted: {e}", icon="🐢🚨")
 
     # Append the full response to session_state.messages
     if isinstance(full_response, str):
