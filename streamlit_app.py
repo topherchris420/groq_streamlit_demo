@@ -5,12 +5,6 @@ import os
 from typing import Optional, Dict, Union
 
 
-# Create a new `st.session_state` object with a maximum length of 100
-st.session_state = st.session_state(max_length=100)
-
-
-
-
 
 def _get_system_prompt():
     current_dir = os.path.dirname(__file__)
@@ -48,7 +42,7 @@ client = Groq(
 
 # Initialize chat history and selected model
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [50]
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
