@@ -30,7 +30,10 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # Initialize chat history and selected model
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "You are James, a helpful assistant."},
+        {"role": "system", "content": system_prompt}
+    ]
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
@@ -57,7 +60,10 @@ with col1:
 
 # Detect model change and clear chat history if model has changed
 if st.session_state.selected_model != model_option:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "You are James, a helpful assistant."},
+        {"role": "system", "content": system_prompt}
+    ]
     st.session_state.selected_model = model_option
 
 max_tokens_range = models[model_option]["tokens"]
@@ -72,12 +78,29 @@ with col2:
         help=f"Adjust the maximum number of tokens for the model's response. Max for selected model: {max_tokens_range}"
     )
 
-# Process the user's input and respond accordingly
-if "user_input" not in st.session_state:
-    st.session_state.user_input = ""
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    avatar = '🐶' if message["role"] == "assistant" else '🧑🏾‍💻'
+    with st.chat_message(message["role"], avatar=avatar):
+        st.markdown(message["content"])
 
-if st.session_state.user_input:
-    st.session_state.messages.append({"role": "user", "content": st.session_state.user_input})
+def generate_chat_responses(chat_completion) -> Generator[str, None, None]:
+    """Yield chat response content from the Groq API response."""
+    for chunk in chat_completion:
+        if chunk.choices[0].delta.content:
+            yield chunk.choices[0].delta.content
+
+system_prompt = _get_system_prompt()
+prompt = system_prompt
+st.session_state.messages.append({"role": "user", "content": prompt})
+st.session_state.selected_model = None
+
+
+if prompt := st.chat_input("Hi, I'm James! How may I help you?", key="user_input"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    with st.chat_message("user", avatar='🧑🏾‍💻'):
+        st.markdown(prompt)
 
     try:
         chat_completion = client.chat.completions.create(
