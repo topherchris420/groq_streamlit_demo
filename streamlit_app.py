@@ -30,11 +30,10 @@ st.image("images/WelcomeHometitle.png", caption="Woof woof!", width=200)
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-# Initialize chat history and selected model
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "system", "content": "You are James, a helpful assistant."},
-        {"role": "system", "content": system_prompt}
+    
+        # {"role": "system", "content": system_prompt}
     ]
 
 if "selected_model" not in st.session_state:
