@@ -33,7 +33,7 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 if "messages" not in st.session_state:
     st.session_state.messages = [
     
-        # {"role": "system", "content": system_prompt}
+        {"role": "system", "content": system_prompt}
     ]
 
 if "selected_model" not in st.session_state:
@@ -62,7 +62,6 @@ with col1:
 # Detect model change and clear chat history if model has changed
 if st.session_state.selected_model != model_option:
     st.session_state.messages = [
-        {"role": "system", "content": "You are James, a helpful assistant."},
         {"role": "system", "content": system_prompt}
     ]
     st.session_state.selected_model = model_option
