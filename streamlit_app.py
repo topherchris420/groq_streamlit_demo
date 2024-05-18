@@ -4,14 +4,12 @@ from groq import Groq
 import os
 from typing import Optional, Dict, Union
 
-
 def _get_system_prompt() -> str:
     """Get system prompt from a file."""
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "system_prompt.txt")
     with open(file_path, "r", encoding="utf-8") as file:
         return file.read()
-
 
 system_prompt = _get_system_prompt()
 
