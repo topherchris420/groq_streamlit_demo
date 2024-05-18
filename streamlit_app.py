@@ -14,6 +14,11 @@ def _get_system_prompt() -> str:
 
 
 system_prompt = _get_system_prompt()
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+    
+        { "role": "system", "content": system_prompt}
+    ]
 
 st.set_page_config(page_icon="coast_chris.png", layout="wide", page_title="Vers3Dynamics")
 
@@ -30,11 +35,6 @@ st.image("images/WelcomeHometitle.png", caption="Woof woof!", width=200)
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-    
-        { "role": "system", "content": system_prompt}
-    ]
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
