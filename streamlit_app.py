@@ -3,35 +3,38 @@ from typing import Generator
 from groq import Groq
 import os
 
-# Function to get system prompt from a file
-def get_system_prompt() -> str:
+
+def _get_system_prompt() -> str:
+    """Get system prompt from a file."""
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "system_prompt.txt")
     with open(file_path, "r", encoding="utf-8") as file:
         return file.read()
 
-system_prompt = get_system_prompt()
+
+system_prompt = _get_system_prompt()
 
 st.set_page_config(page_icon="coast_chris.png", layout="wide", page_title="Vers3Dynamics")
 
-# Function to display emoji icon
-def display_icon(emoji: str):
+def icon(emoji: str):
     """Shows an emoji as a Notion-style page icon."""
     st.write(f'<span style="font-size: 78px; line-height: 1">{emoji}</span>', unsafe_allow_html=True)
 
-display_icon("🐶")
+icon("🐶")
 st.markdown('<a href="https://christopher.streamlit.app/" style="text-decoration:none; color: #00C6C3;"><h2>Vers3Dynamics</h2></a>', unsafe_allow_html=True)
 st.subheader("Meet Your FurBuddy, Powered by Groq 🚀")
 
 # Add a picture with a caption
 st.image("images/WelcomeHometitle.png", caption="Woof woof!", width=200)
 
-# Initialize Groq client
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-# Initialize chat history and selected model in session state
+# Initialize chat history and selected model
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "You are James, a helpful assistant."},
+        {"role": "system", "content": system_prompt}
+    ]
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
@@ -58,7 +61,10 @@ with col1:
 
 # Detect model change and clear chat history if model has changed
 if st.session_state.selected_model != model_option:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "You are James, a helpful assistant."},
+        {"role": "system", "content": system_prompt}
+    ]
     st.session_state.selected_model = model_option
 
 max_tokens_range = models[model_option]["tokens"]
@@ -79,7 +85,6 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-# Function to generate chat responses from Groq API
 def generate_chat_responses(chat_completion) -> Generator[str, None, None]:
     """Yield chat response content from the Groq API response."""
     for chunk in chat_completion:
@@ -104,13 +109,12 @@ if prompt := st.chat_input("Hi, I'm James! How may I help you?", key="user_input
         with st.chat_message("assistant", avatar="🐶"):
             chat_responses_generator = generate_chat_responses(chat_completion)
             full_response = st.write_stream(chat_responses_generator)
-
-        # Append the full response to session_state.messages
-        if isinstance(full_response, str):
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        else:
-            combined_response = "\n".join(str(item) for item in full_response)
-            st.session_state.messages.append({"role": "assistant", "content": combined_response})
-
     except Exception as e:
         st.error(f"Oops! Something went wrong: {e}", icon="🐢🚨")
+
+    # Append the full response to session_state.messages
+    if isinstance(full_response, str):
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+    else:
+        combined_response = "\n".join(str(item) for item in full_response)
+        st.session_state.messages.append({"role": "assistant", "content": combined_response})
