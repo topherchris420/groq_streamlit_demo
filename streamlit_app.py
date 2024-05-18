@@ -15,7 +15,7 @@ def _get_system_prompt() -> str:
 
 system_prompt = _get_system_prompt()
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "system", "content": system_prompt}]
+    st.session_state.messages = []
 
 st.set_page_config(page_icon="coast_chris.png", layout="wide", page_title="Vers3Dynamics")
 
