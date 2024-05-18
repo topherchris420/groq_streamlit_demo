@@ -2,47 +2,36 @@ import streamlit as st
 from typing import Generator
 from groq import Groq
 import os
-from typing import Optional, Dict, Union
 
-
-
-def _get_system_prompt():
+# Function to get system prompt from a file
+def get_system_prompt() -> str:
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "system_prompt.txt")
     with open(file_path, "r", encoding="utf-8") as file:
-        prompt = file.read()
-        return prompt
+        return file.read()
 
-system_prompt = _get_system_prompt()
+system_prompt = get_system_prompt()
 
+st.set_page_config(page_icon="coast_chris.png", layout="wide", page_title="Vers3Dynamics")
 
-
-st.set_page_config(page_icon="coast_chris.png", layout="wide",
-                   page_title="Vers3Dynamics")
-
-
-def icon(emoji: str):
+# Function to display emoji icon
+def display_icon(emoji: str):
     """Shows an emoji as a Notion-style page icon."""
-    st.write(
-        f'<span style="font-size: 78px; line-height: 1">{emoji}</span>',
-        unsafe_allow_html=True,
-    )
+    st.write(f'<span style="font-size: 78px; line-height: 1">{emoji}</span>', unsafe_allow_html=True)
 
-
-icon("🐶")
-st.markdown(f'<a href="https://christopher.streamlit.app/" style="text-decoration:none; color: #00C6C3;"><h2>Vers3Dynamics</h2></a>', unsafe_allow_html=True)
-st.subheader("Meet Your FurBuddy, Powered by Groq 🚀", divider="rainbow", anchor=False)
+display_icon("🐶")
+st.markdown('<a href="https://christopher.streamlit.app/" style="text-decoration:none; color: #00C6C3;"><h2>Vers3Dynamics</h2></a>', unsafe_allow_html=True)
+st.subheader("Meet Your FurBuddy, Powered by Groq 🚀")
 
 # Add a picture with a caption
 st.image("images/WelcomeHometitle.png", caption="Woof woof!", width=200)
 
-client = Groq(
-    api_key=st.secrets["GROQ_API_KEY"],
-)
+# Initialize Groq client
+client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-# Initialize chat history and selected model
+# Initialize chat history and selected model in session state
 if "messages" not in st.session_state:
-    st.session_state.messages = [50]
+    st.session_state.messages = []
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
@@ -90,39 +79,23 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-
+# Function to generate chat responses from Groq API
 def generate_chat_responses(chat_completion) -> Generator[str, None, None]:
     """Yield chat response content from the Groq API response."""
     for chunk in chat_completion:
         if chunk.choices[0].delta.content:
             yield chunk.choices[0].delta.content
 
-system_prompt = _get_system_prompt()
-prompt = system_prompt
-st.session_state.messages.append({"role": "user", "content": prompt})
-st.session_state.selected_model = None
-
-
-if prompt := st.chat_input("Hi, I'm James! how may I help you?", key="user_input"):
+if prompt := st.chat_input("Hi, I'm James! How may I help you?", key="user_input"):
     st.session_state.messages.append({"role": "user", "content": prompt})
-   
-    # Process the user's input and respond accordingly
-    # Use the system_prompt variable to guide the chatbot's responses
 
     with st.chat_message("user", avatar='🧑🏾‍💻'):
         st.markdown(prompt)
 
-    # Fetch response from Groq API
     try:
         chat_completion = client.chat.completions.create(
             model=model_option,
-            messages=[
-                {
-                    "role": m["role"],
-                    "content": m["content"]
-                }
-                for m in st.session_state.messages
-            ],
+            messages=st.session_state.messages,
             max_tokens=max_tokens,
             stream=True
         )
@@ -131,18 +104,13 @@ if prompt := st.chat_input("Hi, I'm James! how may I help you?", key="user_input
         with st.chat_message("assistant", avatar="🐶"):
             chat_responses_generator = generate_chat_responses(chat_completion)
             full_response = st.write_stream(chat_responses_generator)
+
+        # Append the full response to session_state.messages
+        if isinstance(full_response, str):
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+        else:
+            combined_response = "\n".join(str(item) for item in full_response)
+            st.session_state.messages.append({"role": "assistant", "content": combined_response})
+
     except Exception as e:
-        st.error(f"Oops! I farted: {e}", icon="🐢🚨")
-
-    # Append the full response to session_state.messages
-    if isinstance(full_response, str):
-        st.session_state.messages.append(
-            {"role": "assistant", "content": full_response})
-    else:
-        # Handle the case where full_response is not a string
-        combined_response = "\n".join(str(item) for item in full_response)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": combined_response})
-        st.session_state.messages.append(
-            {"role": "assistant", "content": combined_response})
-
+        st.error(f"Oops! Something went wrong: {e}", icon="🐢🚨")
