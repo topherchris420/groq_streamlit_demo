@@ -15,7 +15,7 @@ def _get_system_prompt() -> str:
 
 system_prompt = _get_system_prompt()
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [{"role": "system", "content": system_prompt}]
 
 st.set_page_config(page_icon="coast_chris.png", layout="wide", page_title="Vers3Dynamics")
 
@@ -31,7 +31,6 @@ st.subheader("Meet Your FurBuddy, Powered by Groq 🚀")
 st.image("images/WelcomeHometitle.png", caption="Woof woof!", width=200)
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = None
@@ -59,7 +58,7 @@ with col1:
 # Detect model change and clear chat history if model has changed
 if st.session_state.selected_model != model_option:
     st.session_state.messages = [
-        { "role": "system", "content": system_prompt}
+        {"role": "system", "content": system_prompt}
     ]
     st.session_state.selected_model = model_option
 
@@ -78,8 +77,9 @@ with col2:
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
     avatar = '🐶' if message["role"] == "assistant" else '🧑🏾‍💻'
-    with st.chat_message(message["role"], avatar=avatar):
-        st.markdown(message["content"])
+    if message["role"] != "system":  # Do not display the system message
+        with st.chat_message(message["role"], avatar=avatar):
+            st.markdown(message["content"])
 
 def generate_chat_responses(chat_completion) -> Generator[str, None, None]:
     """Yield chat response content from the Groq API response."""
