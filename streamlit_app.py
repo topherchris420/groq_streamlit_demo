@@ -24,7 +24,7 @@ def icon(emoji: str):
     st.write(f'<span style="font-size: 78px; line-height: 1">{emoji}</span>', unsafe_allow_html=True)
 
 icon("🐶")
-st.markdown('<a href="https://christopher.streamlit.app/" style="text-decoration:none; color: #00C6C3;"><h2>Vers3Dynamics</h2></a>', unsafe_allow_html=True)
+st.markdown('<a href="https://christopher.streamlit.app/" style="text-decoration:none; color: #ADD8E6;"><h2>Vers3Dynamics</h2></a>', unsafe_allow_html=True)
 st.subheader("Meet Your FurBuddy, Powered by Groq 🚀")
 
 # Add a picture with a caption
