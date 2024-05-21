@@ -66,7 +66,7 @@ max_tokens_range = models[model_option]["tokens"]
 
 with col2:
     max_tokens = st.slider(
-        "Max Tokens 🪙:",
+        "Max Tokens 🦴:",
         min_value=512,
         max_value=max_tokens_range,
         value=min(32768, max_tokens_range),
